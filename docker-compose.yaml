@@ -1,0 +1,40 @@
+services:
+  neo4j:
+    image: neo4j:latest
+    container_name: adb-neo4j
+    environment:
+      NEO4J_AUTH: neo4j/password
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j-data:/data
+      
+  mongo:
+    image: mongo
+    container_name: adb-mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo-data:/data
+
+  redis:
+    image: redis
+    container_name: adb-redis
+    ports:
+      - 6379:6379
+    environment:
+      REDIS_PASSWORD: password
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
+  mongo-data:
+  neo4j-data:
+
+

@@ -1,0 +1,642 @@
+definitions:
+  auth.signInRequest:
+    properties:
+      email:
+        example: example@gmail.com
+        type: string
+      password:
+        example: password
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  recipe.createRecipeRequest:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      nutrition:
+        $ref: '#/definitions/recipe.nutrition'
+      servings:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+    required:
+    - category
+    - description
+    - name
+    - servings
+    type: object
+  recipe.nutrition:
+    properties:
+      calories:
+        type: number
+      carbohydrates:
+        type: number
+      fat:
+        type: number
+      fiber:
+        type: number
+      protein:
+        type: number
+      sodium:
+        type: number
+      sugar:
+        type: number
+    type: object
+  recipe.searchParametersRequest:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      query:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  recipe.updateRecipeRequest:
+    properties:
+      category:
+        type: string
+      cook_time:
+        type: integer
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      servings:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+    required:
+    - id
+    type: object
+  response.Response:
+    properties:
+      body: {}
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  user.changePasswordRequest:
+    properties:
+      password:
+        example: password
+        maxLength: 32
+        minLength: 6
+        type: string
+    required:
+    - password
+    type: object
+  user.changeUserRoleRequest:
+    properties:
+      role:
+        example: 0
+        type: integer
+      userID:
+        example: "21"
+        type: string
+    required:
+    - role
+    - userID
+    type: object
+  user.createUserRequest:
+    properties:
+      email:
+        example: example@gmail.com
+        type: string
+      password:
+        example: password
+        maxLength: 32
+        minLength: 6
+        type: string
+      phone:
+        type: string
+      username:
+        example: John Shnow
+        maxLength: 50
+        minLength: 2
+        type: string
+    required:
+    - email
+    - password
+    - phone
+    - username
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: dragon090986@gmail.com
+    name: Kirill Shaforostov
+  description: API for recipe recommendation application
+  title: Recipe API
+  version: 0.0.1
+paths:
+  /admin/users/role/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Change the role of a user with the given ID
+      parameters:
+      - description: User information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.changeUserRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Change user role
+      tags:
+      - User
+  /auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Sign in with credentials and password
+      parameters:
+      - description: Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/auth.signInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Sign in
+      tags:
+      - Auth
+  /auth/signout:
+    post:
+      consumes:
+      - application/json
+      description: Sign out and delete tokens
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Sign out
+      tags:
+      - Auth
+  /recipes:
+    post:
+      consumes:
+      - application/json
+      description: Create a new recipe with the given details
+      parameters:
+      - description: Recipe details
+        in: body
+        name: recipe
+        required: true
+        schema:
+          $ref: '#/definitions/recipe.createRecipeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Create a new recipe
+      tags:
+      - Recipe
+  /recipes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a recipe with the given ID
+      parameters:
+      - description: Recipe ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Delete a recipe
+      tags:
+      - Recipe
+    get:
+      consumes:
+      - application/json
+      description: Get a recipe by the given ID
+      parameters:
+      - description: Recipe ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Get a recipe by ID
+      tags:
+      - Recipe
+    patch:
+      consumes:
+      - application/json
+      description: Update a recipe with the given ID
+      parameters:
+      - description: Recipe ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Recipe details
+        in: body
+        name: recipe
+        required: true
+        schema:
+          $ref: '#/definitions/recipe.updateRecipeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Update a recipe
+      tags:
+      - Recipe
+  /recipes/search:
+    get:
+      consumes:
+      - application/json
+      description: Search recipes based on query, tags, page, and limit
+      parameters:
+      - description: Search parameters
+        in: body
+        name: searchRequest
+        required: true
+        schema:
+          $ref: '#/definitions/recipe.searchParametersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Search recipes
+      tags:
+      - Recipe
+  /recommendation/collaborative:
+    get:
+      consumes:
+      - application/json
+      description: Get recommendation based on similar users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Get recommendation by similar users
+      tags:
+      - Recommendation
+  /recommendation/interaction/{userID}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new interaction for a recipe
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Create new interaction
+      tags:
+      - Recommendation
+  /recommendation/preferences:
+    get:
+      consumes:
+      - application/json
+      description: Get recommendation based on user preferences
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Get recommendation by preferences
+      tags:
+      - Recommendation
+  /users:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the currently logged in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Delete user
+      tags:
+      - User
+    patch:
+      consumes:
+      - application/json
+      description: Update information of the currently logged in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuthcAuth: []
+      summary: Update user information
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the given information
+      parameters:
+      - description: User information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.createUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new user
+      tags:
+      - User
+  /users/{userID}:
+    get:
+      consumes:
+      - application/json
+      description: Get information about the currently logged in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuth: []
+      summary: Get user information
+      tags:
+      - User
+  /users/password:
+    patch:
+      consumes:
+      - application/json
+      description: Change the password of the currently logged in user
+      parameters:
+      - description: User information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.changePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BasicAuthcAuth: []
+      summary: Change user password
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
